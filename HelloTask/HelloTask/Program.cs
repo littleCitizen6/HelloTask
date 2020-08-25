@@ -1,17 +1,36 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HelloTask
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main2(string[] args)
         {
             DateTime start = DateTime.Now;
             Thread main = new Thread(() => ThreadPoolUses());
             main.Start();
             main.Join();
             Console.WriteLine((DateTime.Now-start).TotalMilliseconds);
+        }
+        static void Main(string[] args)
+        {
+            ConcurrentStack<int> st = new ConcurrentStack<int>();
+            for (int i = 0; i < 5000; i++)
+            {
+                st.Push(i);
+            }
+            List<Task> tasks = new List<Task>();
+            for (int i = 0; i < 3; i++)
+            {
+                Task t = new Task(()=>PrintStackContentUntillEmpty(st));
+                t.Start();
+                tasks.Add(t);
+            }
+            Task.WaitAll(tasks.ToArray()) ;
         }
         public static void TimerTread()
         {
@@ -42,7 +61,17 @@ namespace HelloTask
                     Console.WriteLine(obj);
                 },num);
             }
-            Console.ReadLine();
+        }
+        public static async Task PrintStackContentUntillEmpty(ConcurrentStack<int> stack)
+        {
+            while (stack.Count > 0)
+            {
+                int pop;
+                if (stack.TryPop(out pop))
+                {
+                    Console.WriteLine(pop);
+                }
+            }
         }
     }
 }
