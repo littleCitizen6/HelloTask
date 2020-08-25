@@ -8,7 +8,7 @@ namespace HelloTask
 {
     class Program
     {
-        static void Main2(string[] args)
+        static void Main1c(string[] args)
         {
             DateTime start = DateTime.Now;
             Thread main = new Thread(() => ThreadPoolUses());
@@ -16,7 +16,7 @@ namespace HelloTask
             main.Join();
             Console.WriteLine((DateTime.Now-start).TotalMilliseconds);
         }
-        static void Main(string[] args)
+        static void Main2a(string[] args)
         {
             ConcurrentStack<int> st = new ConcurrentStack<int>();
             for (int i = 0; i < 5000; i++)
@@ -31,6 +31,25 @@ namespace HelloTask
                 tasks.Add(t);
             }
             Task.WaitAll(tasks.ToArray()) ;
+        }
+        static void Main(string[] args)
+        {
+            ConcurrentStack<int> st = new ConcurrentStack<int>();
+            for (int i = 0; i < 5000; i++)
+            {
+                st.Push(i);
+            }
+            Parallel.For(0, 5000, index => PrintNum(index, st));
+        }
+        public static void PrintNum(int num, ConcurrentStack<int> st)
+        {
+            {
+                int pop;
+                if (st.TryPop(out pop))
+                {
+                    Console.WriteLine(pop);
+                }
+            }
         }
         public static void TimerTread()
         {
