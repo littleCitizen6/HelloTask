@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace HelloTask
 {
@@ -6,7 +7,22 @@ namespace HelloTask
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            DateTime start = DateTime.Now;
+            Thread main = new Thread(() => TimerTread());
+            main.Start();
+            main.Join();
+            Console.WriteLine((DateTime.Now-start).TotalMilliseconds);
+        }
+        public static void TimerTread()
+        {
+            for (int i = 0; i < 1000000; i++)
+            {
+                Thread t = new Thread(() => {
+                    int num = i;
+                    Console.WriteLine(num);
+                });
+                t.Start();
+            }
         }
     }
 }
